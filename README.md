@@ -1,39 +1,90 @@
-## Advanced Lane Finding
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
-
-
-In this project, your goal is to write a software pipeline to identify the lane boundaries in a video, but the main output or product we want you to create is a detailed writeup of the project.  Check out the [writeup template](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup.  
-
-Creating a great writeup:
----
-A great writeup should include the rubric points as well as your description of how you addressed each point.  You should include a detailed description of the code used in each step (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
-
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
-
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup.
-
-The Project
----
+## **Advanced Lane Finding Project**
 
 The goals / steps of this project are the following:
 
-* Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
-* Apply a distortion correction to raw images.
-* Use color transforms, gradients, etc., to create a thresholded binary image.
-* Apply a perspective transform to rectify binary image ("birds-eye view").
-* Detect lane pixels and fit to find the lane boundary.
-* Determine the curvature of the lane and vehicle position with respect to center.
-* Warp the detected lane boundaries back onto the original image.
-* Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
+- Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
+- Apply a distortion correction to raw images.
+- Use color transforms, gradients, etc., to create a thresholded binary image.
+- Apply a perspective transform to rectify binary image ("birds-eye view").
+- Detect lane pixels and fit to find the lane boundary.
+- Determine the curvature of the lane and vehicle position with respect to center.
+- Warp the detected lane boundaries back onto the original image.
+- Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
-The images for camera calibration are stored in the folder called `camera_cal`.  The images in `test_images` are for testing your pipeline on single frames.  If you want to extract more test images from the videos, you can simply use an image writing method like `cv2.imwrite()`, i.e., you can read the video in frame by frame as usual, and for frames you want to save for later you can write to an image file.  
+## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
-To help the reviewer examine your work, please save examples of the output from each stage of your pipeline in the folder called `output_images`, and include a description in your writeup for the project of what each image shows.    The video called `project_video.mp4` is the video your pipeline should work well on.  
+### Camera Calibration
 
-The `challenge_video.mp4` video is an extra (and optional) challenge for you if you want to test your pipeline under somewhat trickier conditions.  The `harder_challenge.mp4` video is another optional challenge and is brutal!
+#### 1. 图像矫正
 
-If you're feeling ambitious (again, totally optional though), don't stop there!  We encourage you to go out and take video of your own, calibrate your camera and show us how you would implement this project from scratch!
+使用opencv函数获取角点并计算系数矩阵,然后调用undistort进行矫正棋盘
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+![角点](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E6%89%BE%E5%88%B0%E8%A7%92%E7%82%B9.png)
 
+![矫正](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E7%9F%AB%E6%AD%A3%E4%BE%8B%E5%AD%90.png)
+
+### Pipeline (single images)
+
+#### 1. 测试
+
+![测试矫正](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E6%B5%8B%E8%AF%95.png)
+
+#### 2. 获取二值图像
+
+使用sobel算子计算梯度并测试不同颜色通道下使用阈值的效果最重选取效果较好的几种进行组合
+
+测试sobel与v通道阈值效果
+
+![sobel&v](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/sobel%20%26%20v.png)
+
+#### 3.透视变换
+
+
+
+```python
+src = np.float32([(560,464),
+                  (707,464), 
+                  (275,682), 
+                  (1049,682)])
+dst = np.float32([(450,0),
+                  (830,0),
+                  (450,720),
+                  (830,720)])
+```
+
+This resulted in the following source and destination points:
+
+|  Source   | Destination |
+| :-------: | :---------: |
+| 560, 464  |   450, 0    |
+| 707, 464  |   830, 0    |
+| 275, 682  |  450, 720   |
+| 1049, 682 |  830, 720   |
+
+![透视变换](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E8%A7%86%E8%A7%92%E5%8F%98%E6%8D%A2.png)
+
+#### 4. 拟合车道线
+
+使用直方图,在峰指附近进行滑窗选取非零值
+
+![直方图](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E7%9B%B4%E6%96%B9%E5%9B%BE.png)
+
+#### 5. 计算曲率半径和偏移距离
+
+在`calc_curv_rad_and_center_dist`函数中,二次多项式拟合得到
+
+![滑窗拟合](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E6%BB%91%E7%AA%97%E6%8B%9F%E5%90%88.png)
+
+#### 6. 测试
+
+绘制车道线与可行区域
+
+![车道线](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E8%BD%A6%E9%81%93%E7%BA%BF%E7%BB%98%E5%88%B6.png)
+
+------
+
+### Pipeline (video)
+
+#### 1. 视频测试
+
+Here's a [link to my video result](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/project_video_output.mp4)
