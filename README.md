@@ -15,9 +15,13 @@ The goals / steps of this project are the following:
 
 ### Camera Calibration
 
-#### 1. 图像矫正
+#### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
 
-使用opencv函数获取角点并计算系数矩阵,然后调用undistort进行矫正棋盘
+use `findChessboardCorners` to get corner points
+
+use  `cornerSubPix` to identify
+
+use `drawChessboardCorners`  to visualize
 
 ![角点](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E6%89%BE%E5%88%B0%E8%A7%92%E7%82%B9.png)
 
@@ -25,21 +29,23 @@ The goals / steps of this project are the following:
 
 ### Pipeline (single images)
 
-#### 1. 测试
+#### 1.Provide an example of a distortion-corrected image.
+
+use the matrix chreated before and `cv2.undistort` to test on another image
 
 ![测试矫正](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E6%B5%8B%E8%AF%95.png)
 
-#### 2. 获取二值图像
+#### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image. Provide an example of a binary image result.
 
-使用sobel算子计算梯度并测试不同颜色通道下使用阈值的效果最重选取效果较好的几种进行组合
+try to test  Sobel and some different color channels 
 
-测试sobel与v通道阈值效果
+![sobel&v](https://github.com/Aitical/CarND-Advanced-Lane-Lines/blob/master/pic/sobelandhsv-v.png?raw=true)
 
-![sobel&v](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/sobel%20%26%20v.png)
+different color channels
 
-#### 3.透视变换
+![different channels](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/channels.png)
 
-
+#### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
 ```python
 src = np.float32([(560,464),
@@ -61,25 +67,25 @@ This resulted in the following source and destination points:
 | 275, 682  |  450, 720   |
 | 1049, 682 |  830, 720   |
 
-![透视变换](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E8%A7%86%E8%A7%92%E5%8F%98%E6%8D%A2.png)
+![透视变换](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/warp.png)
 
-#### 4. 拟合车道线
+#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-使用直方图,在峰指附近进行滑窗选取非零值
+using the histogram of the half bottom image 
 
 ![直方图](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E7%9B%B4%E6%96%B9%E5%9B%BE.png)
 
-#### 5. 计算曲率半径和偏移距离
-
-在`calc_curv_rad_and_center_dist`函数中,二次多项式拟合得到
+in `sliding_window_polyfit` function to get pixels index
 
 ![滑窗拟合](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E6%BB%91%E7%AA%97%E6%8B%9F%E5%90%88.png)
 
-#### 6. 测试
+#### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-绘制车道线与可行区域
+in `calc_curv_rad_and_center_dist` function
 
-![车道线](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/%E8%BD%A6%E9%81%93%E7%BA%BF%E7%BB%98%E5%88%B6.png)
+#### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+
+![车道线](https://raw.githubusercontent.com/Aitical/CarND-Advanced-Lane-Lines/master/pic/pipeline.png)
 
 ------
 
